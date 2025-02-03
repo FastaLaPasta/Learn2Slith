@@ -22,13 +22,22 @@ class Board:
         :param position: Tuple(x, y) representing the position.
         :return:True if he position is valid False otherwise"""
         x, y = position
-        return 0 <= x < self.size and 0 <= y < self.size
+        if (0 <= x < self.size and 0 <= y < self.size):
+            return True
+        return False
+
+    def remove_old_snake_position(self):
+        """
+        Remove the old snake position.
+        """
+        self.grid[self.grid == 1] = 0
 
     def place_snake(self, snake):
         """
         Place the snake body on the board.
         :param snake: The snake object.
         """
+        self.remove_old_snake_position()
         for segment in snake.body:
             self.grid[segment] = 1
 
@@ -52,4 +61,4 @@ class Board:
         :param position: Tuple(x, y) representing the position.
         :return: True if the position is a collision, False otherwise.
         """
-        return not self.is_valid_position(position) or self.grid[position] == 1
+        return self.is_valid_position(position)

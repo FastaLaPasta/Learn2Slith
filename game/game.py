@@ -1,12 +1,12 @@
 import pygame
-from board import Board
-from snake import Snake
-from apple import Apple
+from game.board import Board
+from game.snake import Snake
+from game.apple import Apple
 
 WINDOW_SIZE = 500
 GRID_SIZE = 10
 CELL_SIZE = WINDOW_SIZE // GRID_SIZE
-FPS = 5
+FPS = 8
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -28,11 +28,13 @@ class Game:
         self.running = True
 
         self.board = Board()
-        self.snake = Snake((5, 5))
+        self.snake = Snake(self.board.size)
         self.apples = [Apple('green'), Apple('green'), Apple('red')]
 
+        self.board.place_snake(self.snake)
         for apple in self.apples:
             apple.place_randomly(self.board)
+            self.board.place_apple(apple)
 
     def handle_input(self):
         """
@@ -57,8 +59,14 @@ class Game:
         """
         self.snake.move()
 
-        if self.snake.check_collision(self.board):
+        if not self.snake.check_collision(self.board):
             print("Game Over! Snake collided.")
+            self.running = False
+            return
+
+        self.board.place_snake(self.snake)
+        if self.snake.eat_itself():
+            print("Game Over! Snake eating itself.")
             self.running = False
             return
 
@@ -67,6 +75,7 @@ class Game:
                 self.snake.eat_apple(apple)
                 self.board.remove_apple(apple)
                 apple.place_randomly(self.board)
+                self.board.place_apple(apple)
                 break
 
         if len(self.snake.body) == 0:
@@ -84,9 +93,12 @@ class Game:
                 rect = pygame.Rect(y * CELL_SIZE, x * CELL_SIZE, CELL_SIZE, CELL_SIZE)
                 pygame.draw.rect(self.screen, BLACK, rect, 1)
 
-        for segment in self.snake.body:
+        for index, segment in enumerate(self.snake.body):
             rect = pygame.Rect(segment[1] * CELL_SIZE, segment[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-            pygame.draw.rect(self.screen, BLUE, rect)
+            if index != 0:
+                pygame.draw.rect(self.screen, BLUE, rect)
+            else:
+                pygame.draw.rect(self.screen, 'darkblue', rect)
 
         for apple in self.apples:
             color = GREEN if apple.color == 'green' else RED

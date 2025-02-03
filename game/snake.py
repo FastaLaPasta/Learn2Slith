@@ -1,13 +1,62 @@
+import random
+
+
 class Snake:
-    def __init__(self, initial_position):
+    def __init__(self, board_size):
         """
         Initialize the snake.
         :param initial_position: Tuple (x, y) representing the starting \
         position of the snake's head.
         """
-        self.body = [initial_position]
-        self.direction = (0, 1)
+        self.body = self.create_snake(board_size)
+        self.direction = self.get_initial_direction()
         self.grow = False
+
+    def get_initial_direction(self):
+        """
+        Determine a valid initial movement direction.
+        :return: Tuple (dx, dy) representing the direction.
+        """
+        head = self.body[0]
+        possible_directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+        for segment in self.body[1:]:
+            dx = segment[0] - head[0]
+            dy = segment[1] - head[1]
+            if (dx, dy) in possible_directions:
+                possible_directions.remove((dx, dy))
+
+        return random.choice(possible_directions) if possible_directions else (0, 1)
+
+    def create_snake(self, board_size):
+        """
+        Create a snake with an L-shaped initial position.
+        :param board_size: Size of the board.
+        :return: A list representing the snake's body.
+        """
+        head_x = random.randint(2, board_size - 2)
+        head_y = random.randint(2, board_size - 2)
+        body = [(head_x, head_y)]
+
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+        dx1, dy1 = random.choice(directions)
+        second_x, second_y = head_x + dx1, head_y + dy1
+        body.append((second_x, second_y))
+
+        possible_bend_directions = [
+            (-1, 0), (1, 0), (0, -1), (0, 1)
+        ]
+        possible_bend_directions.remove((-dx1, -dy1))
+
+        while True:
+            dx2, dy2 = random.choice(possible_bend_directions)
+            third_x, third_y = second_x + dx2, second_y + dy2
+            if 0 <= third_x < board_size and 0 <= third_y < board_size:
+                body.append((third_x, third_y))
+                break
+
+        return body
 
     def move(self):
         """
@@ -45,8 +94,18 @@ class Snake:
         if apple.color == 'green':
             self.grow = True
         elif apple.color == 'red':
-            if len(self.body) > 1:
-                self.body.pop()
+            self.body.pop()
+
+    def eat_itself(self):
+        """
+        Check if the sneak eat his own body.
+        :return True if eating itself, False otherwise.
+        """
+        head = self.body[0]
+        for segment in range(len(self.body)):
+            if head == self.body[segment] and segment != 0:
+                return True
+        return False
 
     def get_vision(self, board):
         """
