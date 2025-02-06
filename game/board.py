@@ -39,7 +39,10 @@ class Board:
         """
         self.remove_old_snake_position()
         for segment in snake.body:
-            self.grid[segment] = 1
+            if segment == snake.body[0]:
+                self.grid[segment] = 5
+            else:
+                self.grid[segment] = 1
 
     def place_apple(self, apple):
         """

@@ -36,44 +36,61 @@ class Game:
             apple.place_randomly(self.board)
             self.board.place_apple(apple)
 
-    def handle_input(self):
+    def handle_input(self, move):
         """
         Handle keyboard input for snake movement.
+        :param moove: The movement asked to proceed.
         """
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         self.running = False
+        #     elif event.type == pygame.KEYDOWN:
+        #         if event.key == pygame.K_UP and self.snake.direction != (1, 0):
+        #             self.snake.change_direction((-1, 0))
+        #         elif event.key == pygame.K_DOWN and self.snake.direction != (-1, 0):
+        #             self.snake.change_direction((1, 0))
+        #         elif event.key == pygame.K_LEFT and self.snake.direction != (0, 1):
+        #             self.snake.change_direction((0, -1))
+        #         elif event.key == pygame.K_RIGHT and self.snake.direction != (0, -1):
+        #             self.snake.change_direction((0, 1))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP and self.snake.direction != (1, 0):
-                    self.snake.change_direction((-1, 0))
-                elif event.key == pygame.K_DOWN and self.snake.direction != (-1, 0):
-                    self.snake.change_direction((1, 0))
-                elif event.key == pygame.K_LEFT and self.snake.direction != (0, 1):
-                    self.snake.change_direction((0, -1))
-                elif event.key == pygame.K_RIGHT and self.snake.direction != (0, -1):
-                    self.snake.change_direction((0, 1))
+                pygame.quit()
+        if move == 0:
+            self.snake.change_direction((-1, 0))
+        elif move == 1:
+            self.snake.change_direction((1, 0))
+        elif move == 2:
+            self.snake.change_direction((0, -1))
+        elif move == 3:
+            self.snake.change_direction((0, 1))
 
     def update(self):
         """
         Update game logic.
         """
+        reward = -0.1
         self.snake.move()
 
         if not self.snake.check_collision(self.board):
             print("Game Over! Snake collided.")
             self.running = False
-            return
+            reward = -10
+            return reward
 
         self.board.place_snake(self.snake)
         if self.snake.eat_itself():
             print("Game Over! Snake eating itself.")
             self.running = False
-            return
+            reward = -10
+            return reward
 
         for apple in self.apples:
             if self.snake.body[0] == apple.position:
-                self.snake.eat_apple(apple)
+                reward = self.snake.eat_apple(apple)
                 self.board.remove_apple(apple)
+                self.board.place_snake(self.snake)
                 apple.place_randomly(self.board)
                 self.board.place_apple(apple)
                 break
@@ -81,6 +98,7 @@ class Game:
         if len(self.snake.body) == 0:
             print("Game Over! Snake has no length.")
             self.running = False
+        return reward
 
     def draw(self):
         """
@@ -106,18 +124,6 @@ class Game:
             pygame.draw.rect(self.screen, color, rect)
 
         pygame.display.flip()
-
-    def run(self):
-        """
-        Run the game loop.
-        """
-        while self.running:
-            self.handle_input()
-            self.update()
-            self.draw()
-            self.clock.tick(FPS)
-
-        pygame.quit()
 
 
 if __name__ == "__main__":

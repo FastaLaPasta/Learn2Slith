@@ -9,24 +9,25 @@ class Snake:
         position of the snake's head.
         """
         self.body = self.create_snake(board_size)
-        self.direction = self.get_initial_direction()
+        self.direction = self.get_direction()
+        print(self.direction)
         self.grow = False
 
-    def get_initial_direction(self):
+    def get_direction(self):
         """
         Determine a valid initial movement direction.
         :return: Tuple (dx, dy) representing the direction.
         """
         head = self.body[0]
-        possible_directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        possible_dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
         for segment in self.body[1:]:
             dx = segment[0] - head[0]
             dy = segment[1] - head[1]
-            if (dx, dy) in possible_directions:
-                possible_directions.remove((dx, dy))
+            if (dx, dy) in possible_dirs:
+                possible_dirs.remove((dx, dy))
 
-        return random.choice(possible_directions) if possible_directions else (0, 1)
+        return random.choice(possible_dirs)
 
     def create_snake(self, board_size):
         """
@@ -93,8 +94,10 @@ class Snake:
         """
         if apple.color == 'green':
             self.grow = True
+            return 10
         elif apple.color == 'red':
             self.body.pop()
+            return -5
 
     def eat_itself(self):
         """
