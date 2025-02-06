@@ -41,18 +41,6 @@ class Game:
         Handle keyboard input for snake movement.
         :param moove: The movement asked to proceed.
         """
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         self.running = False
-        #     elif event.type == pygame.KEYDOWN:
-        #         if event.key == pygame.K_UP and self.snake.direction != (1, 0):
-        #             self.snake.change_direction((-1, 0))
-        #         elif event.key == pygame.K_DOWN and self.snake.direction != (-1, 0):
-        #             self.snake.change_direction((1, 0))
-        #         elif event.key == pygame.K_LEFT and self.snake.direction != (0, 1):
-        #             self.snake.change_direction((0, -1))
-        #         elif event.key == pygame.K_RIGHT and self.snake.direction != (0, -1):
-        #             self.snake.change_direction((0, 1))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
