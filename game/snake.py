@@ -27,7 +27,7 @@ class Snake:
             if (dx, dy) in possible_dirs:
                 possible_dirs.remove((dx, dy))
 
-        return random.choice(possible_dirs)
+        return random.choice(possible_dirs) if possible_dirs else (0, 1)
 
     def create_snake(self, board_size):
         """

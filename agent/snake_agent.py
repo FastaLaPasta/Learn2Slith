@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 
 class Agent:
@@ -7,73 +8,77 @@ class Agent:
         Initialize the Agent class.
         :param episodes: number of episodes of training.
         """
-        self.alpha = 0.9
-        self.gamma = 0.95
+        # How fast do we replace old knowledge, 0 = never/ 1 = completely
+        self.alpha = 0.2
+        # How much consideration given to future rewards
+        self.gamma = 0.975
         self.epsilon = 1
-        self.epsilon_mini = 0.001
-        self.epsilon_decay = 0.975
+        self.epsilon_min = 0.001
+        self.epsilon_decay = 0.98
         self.episodes = episodes
         self.reward = 0
 
-    def choose_action(self):
+        self.state = None
+        self.new_state = None
+        self.action = None
+        self.q_table = np.zeros((4096, 4))
+
+    def update_q_table(self):
+        """
+        Update the Q-table using the Q-learning update rule.
+        """
+        current_q = self.q_table[self.encode_state(self.state), self.action]
+        max_future_q = np.max(self.q_table[self.encode_state(self.new_state)])
+        new_q = (1 - self.alpha) * current_q + self.alpha * (self.reward + self.gamma * max_future_q)
+
+        self.q_table[self.encode_state(self.state), self.action] = new_q
+
+    def choose_action(self, game):
         """
         Choose the following moove.
+        :param snake: The snake object.
+        :param board: The board object.
         """
+        if random.random() < self.epsilon:
+            self.movement(game.snake)
+            return self.action
+        else:
+            self.action = np.argmax(self.q_table[self.encode_state(self.state)])
+            return self.action
 
     def movement(self, snake):
         """
         Choose a random movement that cannot kill itself.
         :param snake: The snake object.
-        :return: The random direction choosen."""
+        :return: The random direction choosen.
+        """
         dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         move = snake.get_direction()
         for dir in range(len(dirs)):
             if move == dirs[dir]:
+                self.action = dir
                 return dir
 
-    def get_state(self, snake, board):
+    def encode_state(self, state):
         """
-        Get the state of the object pass in parameter.
-        :param snake: The snake object.
-        :param board: The game board.
-        :return: return the state of the object pass as a parameter.
+        Convert a list of 12 boolean values into a unique integer index.
+        :param state_list: List of 12 boolean values (0s and 1s).
+        :return: Integer representation of the state.
         """
-        head = snake.body[0]
-        state = []
-        x, y = head
-        directions = {
-            'up': (-1, 0),
-            'down': (1, 0),
-            'right': (0, 1),
-            'left': (0, -1)
-        }
+        return int("".join(map(str, state)), 2)
 
-        for dir in ['up', 'down', 'left', 'right']:
-            dx, dy = directions[dir]
+    def update_epsilon(self):
+        self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
 
-            next_x, next_y = x + dx, y + dy
-            if (not board.is_valid_position((next_x, next_y))) or\
-                    ((next_x, next_y) in snake.body):
-                immediate_danger = True
-            else:
-                immediate_danger = False
+    def save_q_table(self):
+        """
+        Save the Q table in a file.
+        """
+        np.save('Q_table', self.q_table)
 
-            green_apple = False
-            red_apple = False
-
-            temp_x, temp_y = x, y
-            while True:
-                temp_x += dx
-                temp_y += dy
-                if not board.is_valid_position((temp_x, temp_y)):
-                    break
-                cell_value = board.grid[temp_x, temp_y]
-                if cell_value == 2:
-                    green_apple = True
-                    break
-                elif cell_value == 3:
-                    red_apple = True
-                    break
-
-            state.extend([immediate_danger, green_apple, red_apple])
-        return tuple(state)
+    def load_q_table(self, path):
+        """
+        Load a file and set the q-table with the one in it.
+        :param path: Path to the file containing the Q-table.
+        """
+        self.q_table = np.load(path)

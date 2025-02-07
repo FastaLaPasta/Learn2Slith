@@ -20,9 +20,9 @@ class Game:
         """
         Initialize the game components and pygame window.
         """
-        pygame.init()
-        self.screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
-        pygame.display.set_caption("Snake Game")
+        # pygame.init()
+        # self.screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
+        # pygame.display.set_caption("Snake Game")
 
         self.clock = pygame.time.Clock()
         self.running = True
@@ -41,10 +41,10 @@ class Game:
         Handle keyboard input for snake movement.
         :param moove: The movement asked to proceed.
         """
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-                pygame.quit()
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         self.running = False
+        #         pygame.quit()
         if move == 0:
             self.snake.change_direction((-1, 0))
         elif move == 1:
@@ -113,7 +113,49 @@ class Game:
 
         pygame.display.flip()
 
+    def get_state(self):
+        """
+        Get the state of the object pass in parameter.
+        :param snake: The snake object.
+        :param board: The game board.
+        :return: return the state of the object pass as a parameter.
+        """
+        head = self.snake.body[0]
+        state = []
+        x, y = head
+        directions = {
+            'up': (-1, 0),
+            'down': (1, 0),
+            'right': (0, 1),
+            'left': (0, -1)
+        }
 
-if __name__ == "__main__":
-    game = Game()
-    game.run()
+        for dir in ['up', 'down', 'left', 'right']:
+            dx, dy = directions[dir]
+
+            next_x, next_y = x + dx, y + dy
+            if (not self.board.is_valid_position((next_x, next_y))) or\
+                    ((next_x, next_y) in self.snake.body):
+                immediate_danger = 1
+            else:
+                immediate_danger = 0
+
+            green_apple = 0
+            red_apple = 0
+
+            temp_x, temp_y = x, y
+            while True:
+                temp_x += dx
+                temp_y += dy
+                if not self.board.is_valid_position((temp_x, temp_y)):
+                    break
+                cell_value = self.board.grid[temp_x, temp_y]
+                if cell_value == 2:
+                    green_apple = 1
+                    break
+                elif cell_value == 3:
+                    red_apple = 1
+                    break
+
+            state.extend([immediate_danger, green_apple, red_apple])
+        return state
