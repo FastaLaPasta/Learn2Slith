@@ -1,7 +1,15 @@
 import matplotlib.pyplot as plt
 from IPython import display
+import numpy as np
+import os
 
 plt.ion()
+
+
+def open_file(path):
+    if os.path.isfile(path) and path.endswith(".npy"):
+        return np.load(path)
+    raise ValueError('Wrong file/path')
 
 
 def plot(scores, mean_scores):

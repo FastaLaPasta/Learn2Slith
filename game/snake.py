@@ -10,7 +10,6 @@ class Snake:
         """
         self.body = self.create_snake(board_size)
         self.direction = self.get_direction()
-        print(self.direction)
         self.grow = False
 
     def get_direction(self):
@@ -116,27 +115,39 @@ class Snake:
         :param board: The game board.
         :return: A list of lists representing the vision matrix.
         """
-        head = self.body[0]
-        vision = []
+        mtx_size = board.size + 2
+        vision_matrix = [[" " for _ in range(mtx_size)]
+                         for _ in range(mtx_size)]
+
+        head_x, head_y = int(self.body[0][0]) + 1, int(self.body[0][1]) + 1
+        vision_matrix[head_y][head_x] = 'H'
+
+        vision_matrix[0][head_x] = 'W'
+        vision_matrix[-1][head_x] = 'W'
+        vision_matrix[head_y][0] = 'W'
+        vision_matrix[head_y][-1] = 'W'
 
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
         for dx, dy in directions:
-            vision_line = []
-            x, y = head
+            x, y = head_x, head_y
             while True:
                 x += dx
                 y += dy
-                if not board.is_valid_position((x, y)):
-                    vision_line.append('W')
+
+                if not (0 <= x < mtx_size and 0 <= y < mtx_size):
                     break
-                elif (x, y) in self.body:
-                    vision_line.append('S')
-                elif board.grid[x, y] == 2:
-                    vision_line.append('G')
-                elif board.grid[x, y] == 3:
-                    vision_line.append('R')
-                else:
-                    vision_line.append('0')
-            vision.append(vision_line)
-        return vision
+                board_x, board_y = x - 1, y - 1
+
+                vision_matrix[y][x] = '0'
+                if not board.is_valid_position((board_x, board_y)):
+                    vision_matrix[y][x] = 'W'
+                    break
+                elif (board_x, board_y) in self.body:
+                    vision_matrix[y][x] = 'S'
+                elif board.grid[board_x, board_y] == 2:
+                    vision_matrix[y][x] = 'G'
+                elif board.grid[board_x, board_y] == 3:
+                    vision_matrix[y][x] = 'R'
+        for row in vision_matrix:
+            print("".join(row))

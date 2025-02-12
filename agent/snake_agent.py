@@ -3,16 +3,16 @@ import numpy as np
 
 
 class Agent:
-    def __init__(self, episodes=1000):
+    def __init__(self, episodes=10, epsilon=True, alpha=True, file=None):
         """
         Initialize the Agent class.
         :param episodes: number of episodes of training.
         """
         # How fast do we replace old knowledge, 0 = never/ 1 = completely
-        self.alpha = 0.2
+        self.alpha = 0.2 if alpha is True else 0
         # How much consideration given to future rewards
         self.gamma = 0.975
-        self.epsilon = 1
+        self.epsilon = 1 if epsilon is True else 0
         self.epsilon_min = 0.001
         self.epsilon_decay = 0.98
         self.episodes = episodes
@@ -21,7 +21,8 @@ class Agent:
         self.state = None
         self.new_state = None
         self.action = None
-        self.q_table = np.zeros((4096, 4))
+        self.q_table = np.zeros((4096, 4)) if file is None else file
+        print(self.q_table)
 
     def update_q_table(self):
         """

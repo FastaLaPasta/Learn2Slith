@@ -16,18 +16,20 @@ BLUE = (0, 0, 255)
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, size=10, display=True):
         """
         Initialize the game components and pygame window.
         """
-        # pygame.init()
-        # self.screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
-        # pygame.display.set_caption("Snake Game")
+        self.display = display
+        if self.display is True:
+            pygame.init()
+            self.screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
+            pygame.display.set_caption("Snake Game")
 
         self.clock = pygame.time.Clock()
         self.running = True
 
-        self.board = Board()
+        self.board = Board(size)
         self.snake = Snake(self.board.size)
         self.apples = [Apple('green'), Apple('green'), Apple('red')]
 
@@ -41,10 +43,11 @@ class Game:
         Handle keyboard input for snake movement.
         :param moove: The movement asked to proceed.
         """
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         self.running = False
-        #         pygame.quit()
+        if self.display is True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    pygame.quit()
         if move == 0:
             self.snake.change_direction((-1, 0))
         elif move == 1:
@@ -92,26 +95,27 @@ class Game:
         """
         Draw the game objects on the screen.
         """
-        self.screen.fill(WHITE)
+        if self.display:
+            self.screen.fill(WHITE)
 
-        for x in range(GRID_SIZE):
-            for y in range(GRID_SIZE):
-                rect = pygame.Rect(y * CELL_SIZE, x * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-                pygame.draw.rect(self.screen, BLACK, rect, 1)
+            for x in range(GRID_SIZE):
+                for y in range(GRID_SIZE):
+                    rect = pygame.Rect(y * CELL_SIZE, x * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                    pygame.draw.rect(self.screen, BLACK, rect, 1)
 
-        for index, segment in enumerate(self.snake.body):
-            rect = pygame.Rect(segment[1] * CELL_SIZE, segment[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-            if index != 0:
-                pygame.draw.rect(self.screen, BLUE, rect)
-            else:
-                pygame.draw.rect(self.screen, 'darkblue', rect)
+            for index, segment in enumerate(self.snake.body):
+                rect = pygame.Rect(segment[1] * CELL_SIZE, segment[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                if index != 0:
+                    pygame.draw.rect(self.screen, BLUE, rect)
+                else:
+                    pygame.draw.rect(self.screen, 'darkblue', rect)
 
-        for apple in self.apples:
-            color = GREEN if apple.color == 'green' else RED
-            rect = pygame.Rect(apple.position[1] * CELL_SIZE, apple.position[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-            pygame.draw.rect(self.screen, color, rect)
+            for apple in self.apples:
+                color = GREEN if apple.color == 'green' else RED
+                rect = pygame.Rect(apple.position[1] * CELL_SIZE, apple.position[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                pygame.draw.rect(self.screen, color, rect)
 
-        pygame.display.flip()
+            pygame.display.flip()
 
     def get_state(self):
         """

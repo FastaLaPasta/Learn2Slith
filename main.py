@@ -1,40 +1,77 @@
 from game.game import Game
 from agent.snake_agent import Agent
-from utils.helpers import plot
+from utils.helpers import plot, open_file
+import argparse as ap
 
 
 FPS = 1000
 
+
+def print_plot(game, total_size):
+    size.append(len(game.snake.body))
+    total_size += len(game.snake.body)
+    mean_size.append(total_size / episode)
+    plot(size, mean_size)
+    return total_size
+
+
 if __name__ == '__main__':
-    agent = Agent()
+    # Flags
+    parser = ap.ArgumentParser()
+    parser.add_argument("-s", "--size", help="size", type=int, default=10)
+    parser.add_argument("-n", "--training_session", help="Training_session(s)",
+                        type=int, default=1000)
+    parser.add_argument("-e", "--epsilon", help="No learning",
+                        action='store_false')
+    parser.add_argument("-L", "--learning", help='Update agent',
+                        action='store_false')
+    parser.add_argument("-D", "--display", help="Display off",
+                        action="store_false")
+    parser.add_argument("-load_f", "--path",
+                        help="Load a file with training informations",
+                        type=str, default=None)
+    parser.add_argument("-v", "--vision", help="Print snake vision",
+                        action="store_true")
+    args = parser.parse_args()
+
+    try:
+        if (args.path):
+            file = open_file(args.path)
+    except Exception as e:
+        print(e)
+
+    agent = Agent(args.training_session, args.epsilon, args.learning, args.path)
     total_size = 0
     size = []
     mean_size = []
     for episode in range(1, agent.episodes):
-        game = Game()
+        game = Game(args.size, args.display)
+        if args.vision:
+            print(game.snake.get_vision(game.board))
         while game.running:
             agent.state = game.get_state()
             game.handle_input(agent.choose_action(game))
             agent.reward = game.update()
             if game.snake.body:
                 agent.new_state = game.get_state()
-            # print(agent.state, agent.new_state)
             agent.update_q_table()
-            # game.draw()
-            # game.clock.tick(FPS)
+            game.draw()
+            game.clock.tick(FPS)
         agent.update_epsilon()
-        # size.append(len(game.snake.body))
-        # total_size += len(game.snake.body)
-        # mean_size.append(total_size / episode)
-        # plot(size, mean_size)
+        total_size = print_plot(game, total_size)
     agent.save_q_table()
 
 
-# TODO Step-bt-step Mode
-# TODO state segfault quand meurt de pomme rouge
-# TODO Vision matrix
-# TODO Flags
-# TODO Use the q-table from a file/ Non random move then
+# TODO Step-bt-step Mode 🚧
+# TODO state segfault quand meurt de pomme rouge / Maybe Done with if in main ✅
+# TODO Vision matrix // DONE ✅
+# TODO Flags 🚧
+# TODO Use the q-table from a file/ Non random move then 🚧
+# TODO Flags Number of training session ✅/ don't learn ✅/ Visual display ✅
+# load file / epsilon 0 ✅
+# TODO one Game object for the loop
 
-# TODO Bonus: modifiable board Size, Accurcy of the bot, Neural network Agent
+# TODO Bonus: modifiable board Size ✅ Implement draw function 🚧
+# TODO Accurcy of the bot
+# TODO Neural network Agent
 # TODO Norme FLAKE8
