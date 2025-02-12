@@ -21,6 +21,7 @@ class Game:
         Initialize the game components and pygame window.
         """
         self.display = display
+        self.board_size = size
         if self.display is True:
             pygame.init()
             self.screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
@@ -37,6 +38,14 @@ class Game:
         for apple in self.apples:
             apple.place_randomly(self.board)
             self.board.place_apple(apple)
+
+    def restart(self):
+        self.snake.respawn(self.board_size)
+        # self.board.place_snake(self.snake)
+        for apple in self.apples:
+            apple.place_randomly(self.board)
+            self.board.place_apple(apple)
+        self.running = True
 
     def handle_input(self, move):
         """

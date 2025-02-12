@@ -4,7 +4,7 @@ from utils.helpers import plot, open_file
 import argparse as ap
 
 
-FPS = 1000
+FPS = 10
 
 
 def print_plot(game, total_size):
@@ -16,7 +16,6 @@ def print_plot(game, total_size):
 
 
 if __name__ == '__main__':
-    # Flags
     parser = ap.ArgumentParser()
     parser.add_argument("-s", "--size", help="size", type=int, default=10)
     parser.add_argument("-n", "--training_session", help="Training_session(s)",
@@ -37,15 +36,17 @@ if __name__ == '__main__':
     try:
         if (args.path):
             file = open_file(args.path)
+            agent = Agent(args.training_session, args.epsilon, args.learning, file)
+        else:
+            agent = Agent(args.training_session, args.epsilon, args.learning)
     except Exception as e:
         print(e)
-
-    agent = Agent(args.training_session, args.epsilon, args.learning, args.path)
     total_size = 0
     size = []
     mean_size = []
-    for episode in range(1, agent.episodes):
-        game = Game(args.size, args.display)
+    game = Game(args.size, args.display)
+    for episode in range(1, agent.episodes + 1):
+        game.restart()
         if args.vision:
             print(game.snake.get_vision(game.board))
         while game.running:
@@ -55,23 +56,25 @@ if __name__ == '__main__':
             if game.snake.body:
                 agent.new_state = game.get_state()
             agent.update_q_table()
-            game.draw()
-            game.clock.tick(FPS)
+            if args.display:
+                game.draw()
+                game.clock.tick(FPS)
         agent.update_epsilon()
         total_size = print_plot(game, total_size)
     agent.save_q_table()
 
 
 # TODO Step-bt-step Mode 🚧
+# TODO main() function need to be create and called🚧
+# TODO Bonus: modifiable board Size ✅ Implement draw function 🚧
+# TODO Accurcy of the bot 🚧
+# TODO Neural network Agent 🚧
+# TODO Norme FLAKE8 🚧
+
 # TODO state segfault quand meurt de pomme rouge / Maybe Done with if in main ✅
 # TODO Vision matrix // DONE ✅
-# TODO Flags 🚧
-# TODO Use the q-table from a file/ Non random move then 🚧
+# TODO Flags ✅
+# TODO Use the q-table from a file/ Non random move then ✅
 # TODO Flags Number of training session ✅/ don't learn ✅/ Visual display ✅
-# load file / epsilon 0 ✅
-# TODO one Game object for the loop
-
-# TODO Bonus: modifiable board Size ✅ Implement draw function 🚧
-# TODO Accurcy of the bot
-# TODO Neural network Agent
-# TODO Norme FLAKE8
+# load file ✅/ epsilon 0 ✅
+# TODO one Game object for the loop ✅

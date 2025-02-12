@@ -28,6 +28,10 @@ class Snake:
 
         return random.choice(possible_dirs) if possible_dirs else (0, 1)
 
+    def respawn(self, board_size):
+        self.body = []
+        self.body = self.create_snake(board_size)
+
     def create_snake(self, board_size):
         """
         Create a snake with an L-shaped initial position.
@@ -127,6 +131,7 @@ class Snake:
         vision_matrix[head_y][0] = 'W'
         vision_matrix[head_y][-1] = 'W'
 
+        dirs = ["UP", "DOWN", "LEFT", "RIGHT"]
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
         for dx, dy in directions:
@@ -151,3 +156,6 @@ class Snake:
                     vision_matrix[y][x] = 'R'
         for row in vision_matrix:
             print("".join(row))
+        for dir in range(len(directions)):
+            if directions[dir] == self.direction:
+                print(dirs[dir])

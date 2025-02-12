@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import os
 
 
 class Agent:
@@ -22,7 +23,6 @@ class Agent:
         self.new_state = None
         self.action = None
         self.q_table = np.zeros((4096, 4)) if file is None else file
-        print(self.q_table)
 
     def update_q_table(self):
         """
@@ -75,7 +75,7 @@ class Agent:
         """
         Save the Q table in a file.
         """
-        np.save('Q_table', self.q_table)
+        np.save(f'models/model_{self.episodes}_session.npy', self.q_table)
 
     def load_q_table(self, path):
         """
