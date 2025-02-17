@@ -2,6 +2,7 @@ from game.game import Game
 from agent.snake_agent import Agent
 from utils.helpers import plot, open_file
 import argparse as ap
+import pygame as pg
 
 
 FPS = 1000
@@ -18,6 +19,10 @@ def print_plot(game, total_size):
 if __name__ == '__main__':
     # Flags
     parser = ap.ArgumentParser()
+    parser.add_argument("-save", "--save", help="save model parameters",
+                        action="store_true")
+    parser.add_argument("-step", "--step",
+                        help="activate step-b-step mode", action="store_true")
     parser.add_argument("-s", "--size", help="size", type=int, default=10)
     parser.add_argument("-n", "--training_session", help="Training_session(s)",
                         type=int, default=1000)
@@ -37,15 +42,19 @@ if __name__ == '__main__':
     try:
         if (args.path):
             file = open_file(args.path)
+            agent = Agent(args.training_session, args.epsilon, args.learning, file)
+        else:
+            agent = Agent(args.training_session, args.epsilon, args.learning)
     except Exception as e:
         print(e)
 
-    agent = Agent(args.training_session, args.epsilon, args.learning, args.path)
     total_size = 0
     size = []
     mean_size = []
+    print(args.step)
+    game = Game(args.size, args.display)
     for episode in range(1, agent.episodes):
-        game = Game(args.size, args.display)
+        game.restart()
         if args.vision:
             print(game.snake.get_vision(game.board))
         while game.running:
@@ -55,23 +64,29 @@ if __name__ == '__main__':
             if game.snake.body:
                 agent.new_state = game.get_state()
             agent.update_q_table()
-            game.draw()
-            game.clock.tick(FPS)
+            if args.display:
+                game.draw()
+                game.clock.tick(FPS)
+            if args.step:
+                input("Press enter to continue...")
         agent.update_epsilon()
         total_size = print_plot(game, total_size)
-    agent.save_q_table()
+    if args.save:
+        agent.save_q_table()
 
 
-# TODO Step-bt-step Mode 🚧
+# TODO Step-bt-step Mode ✅
 # TODO state segfault quand meurt de pomme rouge / Maybe Done with if in main ✅
 # TODO Vision matrix // DONE ✅
-# TODO Flags 🚧
-# TODO Use the q-table from a file/ Non random move then 🚧
+# TODO Flags ✅
+# TODO Use the q-table from a file/ Non random move then ✅
 # TODO Flags Number of training session ✅/ don't learn ✅/ Visual display ✅
-# load file / epsilon 0 ✅
+# load file / epsilon 0 ✅/ save the models parameters ✅
 # TODO one Game object for the loop
 
-# TODO Bonus: modifiable board Size ✅ Implement draw function 🚧
+# TODO Bonus: modifiable board Size ✅ Implement draw function ✅
+
+
 # TODO Accurcy of the bot
 # TODO Neural network Agent
 # TODO Norme FLAKE8
