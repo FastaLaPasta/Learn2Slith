@@ -18,7 +18,7 @@ def plot(scores, mean_scores):
     :param scores: An array containing the score of each episode.
     :param mean_scores: An array containing the mean scores."""
     display.clear_output(wait=True)
-    display.display(plt.gcf())
+    # display.display(plt.gcf())
     plt.clf()
     plt.title('Training...')
     plt.xlabel('Number of Games')

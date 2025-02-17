@@ -3,11 +3,6 @@ from game.board import Board
 from game.snake import Snake
 from game.apple import Apple
 
-WINDOW_SIZE = 500
-GRID_SIZE = 10
-CELL_SIZE = WINDOW_SIZE // GRID_SIZE
-FPS = 8
-
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
@@ -20,10 +15,13 @@ class Game:
         """
         Initialize the game components and pygame window.
         """
+        self.cell_size = 60
         self.display = display
+        self.board_size = size
+        self.window = self.cell_size * self.board_size
         if self.display is True:
             pygame.init()
-            self.screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
+            self.screen = pygame.display.set_mode((self.window, self.window))
             pygame.display.set_caption("Snake Game")
 
         self.clock = pygame.time.Clock()
@@ -38,12 +36,21 @@ class Game:
             apple.place_randomly(self.board)
             self.board.place_apple(apple)
 
+    def restart(self):
+        self.board.reset()
+        self.snake.respawn(self.board_size)
+        self.board.place_snake(self.snake)
+        for apple in self.apples:
+            apple.place_randomly(self.board)
+            self.board.place_apple(apple)
+        self.running = True
+
     def handle_input(self, move):
         """
         Handle keyboard input for snake movement.
         :param moove: The movement asked to proceed.
         """
-        if self.display is True:
+        if self.display is True and self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -65,14 +72,12 @@ class Game:
         self.snake.move()
 
         if not self.snake.check_collision(self.board):
-            print("Game Over! Snake collided.")
             self.running = False
             reward = -10
             return reward
 
         self.board.place_snake(self.snake)
         if self.snake.eat_itself():
-            print("Game Over! Snake eating itself.")
             self.running = False
             reward = -10
             return reward
@@ -87,7 +92,6 @@ class Game:
                 break
 
         if len(self.snake.body) == 0:
-            print("Game Over! Snake has no length.")
             self.running = False
         return reward
 
@@ -95,16 +99,16 @@ class Game:
         """
         Draw the game objects on the screen.
         """
-        if self.display:
+        if self.display and self.running:
             self.screen.fill(WHITE)
 
-            for x in range(GRID_SIZE):
-                for y in range(GRID_SIZE):
-                    rect = pygame.Rect(y * CELL_SIZE, x * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            for x in range(self.board_size):
+                for y in range(self.board_size):
+                    rect = pygame.Rect(y * self.cell_size, x * self.cell_size, self.cell_size, self.cell_size)
                     pygame.draw.rect(self.screen, BLACK, rect, 1)
 
             for index, segment in enumerate(self.snake.body):
-                rect = pygame.Rect(segment[1] * CELL_SIZE, segment[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                rect = pygame.Rect(segment[1] * self.cell_size, segment[0] * self.cell_size, self.cell_size, self.cell_size)
                 if index != 0:
                     pygame.draw.rect(self.screen, BLUE, rect)
                 else:
@@ -112,7 +116,7 @@ class Game:
 
             for apple in self.apples:
                 color = GREEN if apple.color == 'green' else RED
-                rect = pygame.Rect(apple.position[1] * CELL_SIZE, apple.position[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                rect = pygame.Rect(apple.position[1] * self.cell_size, apple.position[0] * self.cell_size, self.cell_size, self.cell_size)
                 pygame.draw.rect(self.screen, color, rect)
 
             pygame.display.flip()

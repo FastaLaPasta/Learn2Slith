@@ -98,6 +98,10 @@ class Snake:
             self.body.pop()
             return -5
 
+    def respawn(self, board_size):
+        self.body = []
+        self.body = self.create_snake(board_size)
+
     def eat_itself(self):
         """
         Check if the sneak eat his own body.
@@ -115,6 +119,7 @@ class Snake:
         :param board: The game board.
         :return: A list of lists representing the vision matrix.
         """
+        dirs = ["UP", "DOWN", "LEFT", "RIGHT"]
         mtx_size = board.size + 2
         vision_matrix = [[" " for _ in range(mtx_size)]
                          for _ in range(mtx_size)]
@@ -151,3 +156,6 @@ class Snake:
                     vision_matrix[y][x] = 'R'
         for row in vision_matrix:
             print("".join(row))
+        for dir in range(len(directions)):
+            if directions[dir] == self.direction:
+                print(dirs[dir])
