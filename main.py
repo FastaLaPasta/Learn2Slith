@@ -2,7 +2,6 @@ from game.game import Game
 from agent.snake_agent import Agent
 from utils.helpers import plot, open_file
 import argparse as ap
-import pygame as pg
 
 
 FPS = 1000
@@ -24,7 +23,7 @@ if __name__ == '__main__':
     parser.add_argument("-step", "--step",
                         help="activate step-b-step mode", action="store_true")
     parser.add_argument("-s", "--size", help="size", type=int, default=10)
-    parser.add_argument("-n", "--training_session", help="Training_session(s)",
+    parser.add_argument("-n", "--training", help="Training_session(s)",
                         type=int, default=1000)
     parser.add_argument("-e", "--epsilon", help="No learning",
                         action='store_false')
@@ -42,9 +41,9 @@ if __name__ == '__main__':
     try:
         if (args.path):
             file = open_file(args.path)
-            agent = Agent(args.training_session, args.epsilon, args.learning, file)
+            agent = Agent(args.training, args.epsilon, args.learning, file)
         else:
-            agent = Agent(args.training_session, args.epsilon, args.learning)
+            agent = Agent(args.training, args.epsilon, args.learning)
     except Exception as e:
         print(e)
 

@@ -1,6 +1,5 @@
 import random
 import numpy as np
-import os
 
 
 class Agent:
@@ -30,7 +29,8 @@ class Agent:
         """
         current_q = self.q_table[self.encode_state(self.state), self.action]
         max_future_q = np.max(self.q_table[self.encode_state(self.new_state)])
-        new_q = (1 - self.alpha) * current_q + self.alpha * (self.reward + self.gamma * max_future_q)
+        new_q = (1 - self.alpha) * current_q + self.alpha *\
+            (self.reward + self.gamma * max_future_q)
 
         self.q_table[self.encode_state(self.state), self.action] = new_q
 
@@ -44,7 +44,8 @@ class Agent:
             self.movement(game.snake)
             return self.action
         else:
-            self.action = np.argmax(self.q_table[self.encode_state(self.state)])
+            self.action = np.argmax(
+                self.q_table[self.encode_state(self.state)])
             return self.action
 
     def movement(self, snake):

@@ -104,11 +104,15 @@ class Game:
 
             for x in range(self.board_size):
                 for y in range(self.board_size):
-                    rect = pygame.Rect(y * self.cell_size, x * self.cell_size, self.cell_size, self.cell_size)
+                    rect = pygame.Rect(y * self.cell_size, x *
+                                       self.cell_size, self.cell_size,
+                                       self.cell_size)
                     pygame.draw.rect(self.screen, BLACK, rect, 1)
 
             for index, segment in enumerate(self.snake.body):
-                rect = pygame.Rect(segment[1] * self.cell_size, segment[0] * self.cell_size, self.cell_size, self.cell_size)
+                rect = pygame.Rect(segment[1] * self.cell_size, segment[0] *
+                                   self.cell_size, self.cell_size,
+                                   self.cell_size)
                 if index != 0:
                     pygame.draw.rect(self.screen, BLUE, rect)
                 else:
@@ -116,7 +120,10 @@ class Game:
 
             for apple in self.apples:
                 color = GREEN if apple.color == 'green' else RED
-                rect = pygame.Rect(apple.position[1] * self.cell_size, apple.position[0] * self.cell_size, self.cell_size, self.cell_size)
+                rect = pygame.Rect(apple.position[1] *
+                                   self.cell_size, apple.position[0] *
+                                   self.cell_size, self.cell_size,
+                                   self.cell_size)
                 pygame.draw.rect(self.screen, color, rect)
 
             pygame.display.flip()
